@@ -1,21 +1,20 @@
 using System;
-using System.Globalization;
-using Dalamud;
+using Dalamud.Game;
 using Dalamud.Plugin.Services;
 using Lumina.Text;
 
 namespace GatherBuddy.Utility;
 
-public readonly struct MultiString
+public readonly struct MultiString(string cn)
 {
     public static string ParseSeStringLumina(SeString? luminaString)
         => luminaString == null ? string.Empty : Dalamud.Game.Text.SeStringHandling.SeString.Parse(luminaString.RawData).TextValue;
 
-    public readonly string English;
-    public readonly string German;
-    public readonly string French;
-    public readonly string Japanese;
-    public readonly string Chinese;
+    public readonly string English  = string.Empty;
+    public readonly string German   = string.Empty;
+    public readonly string French   = string.Empty;
+    public readonly string Japanese = string.Empty;
+    public readonly string Chinese  = cn;
 
     public string this[ClientLanguage lang]
         => Name(lang);
@@ -26,34 +25,16 @@ public readonly struct MultiString
     public string ToWholeString()
         => $"{English}|{German}|{French}|{Japanese}|{Chinese}";
 
-    public MultiString(string en, string de, string fr, string jp, string cn)
-    {
-        English  = en;
-        German   = de;
-        French   = fr;
-        Japanese = jp;
-        Chinese  = cn;
-    }
-
-
     public static MultiString FromPlaceName(IDataManager gameData, uint id)
     {
-        var en = string.Empty;
-        var de = string.Empty;
-        var fr = string.Empty;
-        var jp = string.Empty;
         var cn = ParseSeStringLumina(gameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.PlaceName>(ClientLanguage.ChineseSimplified)!.GetRow(id)?.Name);
-        return new MultiString(en, de, fr, jp,cn);
+        return new MultiString(cn);
     }
 
     public static MultiString FromItem(IDataManager gameData, uint id)
     {
-        var en = string.Empty;
-        var de = string.Empty;
-        var fr = string.Empty;
-        var jp = string.Empty;
         var cn = ParseSeStringLumina(gameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.Item>(ClientLanguage.ChineseSimplified)!.GetRow(id)?.Name);
-        return new MultiString(en, de, fr, jp,cn);
+        return new MultiString(cn);
     }
 
     private string Name(ClientLanguage lang)
@@ -67,5 +48,5 @@ public readonly struct MultiString
             _                       => throw new ArgumentException(),
         };
 
-    public static readonly MultiString Empty = new(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+    public static readonly MultiString Empty = new(string.Empty);
 }
